@@ -1,41 +1,37 @@
 use clipstash::data::AppDatabase;
 use clipstash::domain::clip;
-use clipstash::web::{renderer::Renderer};
+use clipstash::web::renderer::Renderer;
 use dotenv::dotenv;
-use structopt::clap::App;
 use std::path::PathBuf;
+use structopt::clap::App;
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "httpd")]
 struct Opt {
-  #[structopt(default_value = "sqlite:data.db")]
-  connection_string: String,
-  #[structopt(short, long, parse(from_os_str), default_value = "templates/")]
-  template_directory: PathBuf
+    #[structopt(default_value = "sqlite:data.db")]
+    connection_string: String,
+    #[structopt(short, long, parse(from_os_str), default_value = "templates/")]
+    template_directory: PathBuf,
 }
 
 fn main() {
-  dotenv().ok();
-  let opt = Opt::from_args();
-  
-  let rt = tokio::runtime::Runtime::new()
-    .expect("failed to spawn tokio runtime");
+    dotenv().ok();
+    let opt = Opt::from_args();
 
-  let handle = rt.handle().clone();
+    let rt = tokio::runtime::Runtime::new().expect("failed to spawn tokio runtime");
 
-  rt.block_on(async move {
-    let renderer = Renderer::new(opt.template_directory);
-    let database = AppDatabase::new(&opt.connection_string).await;
+    let handle = rt.handle().clone();
 
-    let config = clipstash::RocketConfig {
-      renderer,
-      database
-    };
+    rt.block_on(async move {
+        let renderer = Renderer::new(opt.template_directory);
+        let database = AppDatabase::new(&opt.connection_string).await;
 
-    clipstash::rocket(config)
-      .launch()
-      .await
-      .expect("failed to launch rocket server");
-  });
+        let config = clipstash::RocketConfig { renderer, database };
+
+        clipstash::rocket(config)
+            .launch()
+            .await
+            .expect("failed to launch rocket server");
+    });
 }
