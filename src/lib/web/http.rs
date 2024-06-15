@@ -138,7 +138,7 @@ pub async fn submit_clip_password(
     }
 }
 
-#[rocket::get("/clip/raw<shortcode>")]
+#[rocket::get("/clip/raw/<shortcode>")]
 pub async fn get_raw_clip(
     cookies: &CookieJar<'_>,
     shortcode: ShortCode,
