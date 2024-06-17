@@ -1,22 +1,26 @@
 use crate::domain::clip::ClipError;
-use core::str;
 use derive_more::From;
+use rocket::request::FromParam;
 use rocket::{UriDisplayPath, UriDisplayQuery};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-#[derive(Debug, Clone, Deserialize, Serialize, From, UriDisplayQuery, UriDisplayPath)]
+/// The shortcode field for a [`Clip`](crate::domain::clip::Clip).
+///
+/// The shortcode is utilized by clients to locate the `Clip` within the service.
+#[derive(
+    Debug, Clone, Deserialize, Serialize, From, UriDisplayQuery, UriDisplayPath, Hash, Eq, PartialEq,
+)]
 pub struct ShortCode(String);
 
 impl ShortCode {
+    /// Create a new `ShortCode` field.
     pub fn new() -> Self {
         use rand::prelude::*;
-
         let allowed_chars = ['a', 'b', 'c', 'd', '1', '2', '3', '4'];
 
         let mut rng = thread_rng();
         let mut shortcode = String::with_capacity(10);
-
         for _ in 0..10 {
             shortcode.push(
                 *allowed_chars
@@ -27,15 +31,18 @@ impl ShortCode {
         Self(shortcode)
     }
 
+    /// Return the underlying [`&str`].
     pub fn as_str(&self) -> &str {
         self.0.as_str()
     }
 
+    /// Return the underlying [`String`].
     pub fn into_inner(self) -> String {
         self.0
     }
 }
 
+/// The Default implementation is a new randomly generated shortcode.
 impl Default for ShortCode {
     fn default() -> Self {
         Self::new()
@@ -54,8 +61,6 @@ impl From<&str> for ShortCode {
     }
 }
 
-use rocket::request::FromParam;
-
 impl<'r> FromParam<'r> for ShortCode {
     type Error = &'r str;
 
@@ -66,7 +71,6 @@ impl<'r> FromParam<'r> for ShortCode {
 
 impl FromStr for ShortCode {
     type Err = ClipError;
-
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self(s.into()))
     }

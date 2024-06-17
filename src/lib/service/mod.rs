@@ -1,17 +1,24 @@
+//! Intermediate layer between the data layer and web layer.
+
 pub mod action;
 pub mod ask;
 
 use crate::{ClipError, DataError};
 
+/// The possible errors that can occur when working with the [`service layer`](crate::service).
 #[derive(Debug, thiserror::Error)]
 pub enum ServiceError {
+    /// A clip error.
     #[error("clip error: {0}")]
     Clip(#[from] ClipError),
+    /// A database error.
     #[error("database error: {0}")]
     Data(DataError),
+    /// Data not found.
     #[error("not found")]
     NotFound,
-    #[error("permission not met: {0}")]
+    /// Password does not match for password protected [`Clip`](crate::domain::Clip).
+    #[error("permissions not met: {0}")]
     PermissionError(String),
 }
 
