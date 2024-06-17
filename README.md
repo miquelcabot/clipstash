@@ -12,7 +12,7 @@ After installing Rust, you can clone the repository and navigate to the project 
 cargo run --bin name
 ```
 
-where `name` is the name of the binary you wish to run.
+where `name` is the name of the binary you wish to run (`httpd` or `clipclient`).
 
 To check the project for errors, you can run the following command:
 
